@@ -108,21 +108,49 @@ class BBIO_PWM_Adapter(object):
         """Stop PWM output on specified pin."""
         self.bbio_pwm.stop(pin)
 
+class CHIP_PWM_Adapter(object):
+    """PWM implementation for the Next Thing Co CHIP using simple threads
+    """
+
+    def __init__(self):
+        pass;
+
+    def start(self, pin, dutycycle, frequency_hz=200):
+        """Enable PWM output on specified pin.  Set to intiial percent duty cycle
+        value (0.0 to 100.0) and frequency (in Hz).
+        """
+        pass;
+
+    def set_duty_cycle(self, pin, dutycycle):
+        """Set percent duty cycle of PWM output on specified pin.  Duty cycle must
+        be a value 0.0 to 100.0 (inclusive).
+        """
+        pass;
+
+    def set_frequency(self, pin, frequency_hz):
+        """Set frequency (in Hz) of PWM output on specified pin."""
+        pass;
+
+    def stop(self, pin):
+        """Stop PWM output on specified pin."""
+        pass; 
 
 def get_platform_pwm(**keywords):
     """Attempt to return a PWM instance for the platform which the code is being
-    executed on.  Currently supports only the Raspberry Pi using the RPi.GPIO
-    library and Beaglebone Black using the Adafruit_BBIO library.  Will throw an
-    exception if a PWM instance can't be created for the current platform.  The
-    returned PWM object has the same interface as the RPi_PWM_Adapter and
-    BBIO_PWM_Adapter classes.
+    executed on. Will throw an exception if a PWM instance can't be created for
+    the current platform.  The returned PWM object has the same interface as the
+    RPi_PWM_Adapter and BBIO_PWM_Adapter classes.
     """
     plat = Platform.platform_detect()
+    print "platform is plat:"
+    print plat
     if plat == Platform.RASPBERRY_PI:
         import RPi.GPIO
         return RPi_PWM_Adapter(RPi.GPIO, **keywords)
     elif plat == Platform.BEAGLEBONE_BLACK:
         import Adafruit_BBIO.PWM
         return BBIO_PWM_Adapter(Adafruit_BBIO.PWM, **keywords)
+    elif plat == Platform.CHIP:
+        return CHIP_PWM_Adapter(**keywords)
     elif plat == Platform.UNKNOWN:
         raise RuntimeError('Could not determine platform.')
