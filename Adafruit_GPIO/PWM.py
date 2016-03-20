@@ -20,6 +20,9 @@
 # THE SOFTWARE.
 import Adafruit_GPIO.Platform as Platform
 
+import threading
+from time import time, sleep
+
 
 class RPi_PWM_Adapter(object):
     """PWM implementation for the Raspberry Pi using the RPi.GPIO PWM library."""
@@ -113,27 +116,33 @@ class CHIP_PWM_Adapter(object):
     """
 
     def __init__(self):
+        self._pwmEngine = PythonPwmEngine();
         pass;
 
-    def start(self, pin, dutycycle, frequency_hz=200):
+    def start(self, pin, dutycycle, frequency_hz=20):
         """Enable PWM output on specified pin.  Set to intiial percent duty cycle
         value (0.0 to 100.0) and frequency (in Hz).
         """
+        self._pwmEngine.Add(str(pin), dutycycle, (1/frequency_hz)/100);
         pass;
 
     def set_duty_cycle(self, pin, dutycycle):
         """Set percent duty cycle of PWM output on specified pin.  Duty cycle must
         be a value 0.0 to 100.0 (inclusive).
         """
+        self._pwmEngine.SetPercent(str(pin), dutycycle)
         pass;
 
     def set_frequency(self, pin, frequency_hz):
         """Set frequency (in Hz) of PWM output on specified pin."""
+        #Breaks API - sets frequency for ALL pins
+        self._pwmEngine.SetInterval((1/frequency_hz)/100)
         pass;
 
     def stop(self, pin):
         """Stop PWM output on specified pin."""
-        pass; 
+        self._pwmEngine.Remove(str(pin))
+        pass;
 
 def get_platform_pwm(**keywords):
     """Attempt to return a PWM instance for the platform which the code is being
@@ -154,3 +163,56 @@ def get_platform_pwm(**keywords):
         return CHIP_PWM_Adapter(**keywords)
     elif plat == Platform.UNKNOWN:
         raise RuntimeError('Could not determine platform.')
+
+class PythonPwmEngine:
+    def __init__(self, on=True, off=False):
+        # An interval of .01 is pretty much the smallest value Windows can produce consistently
+        # Smaller values will likely have no effect
+        # Zero is allowed, but will likely produce inconsistent readings
+
+        self.On = on
+        self.Off = off
+        self._interval = 0.05
+        self._counter = 0
+        self._signals = {}
+        self._clock = threading.Thread()
+        self._clock.setDaemon(True)
+        self._clock.run = self._ticktock
+        self._clock.start()
+
+    def _ticktock(self):
+        while True:
+            print self._counter
+            for signal, percent in self._signals.iteritems():
+                if self._counter == percent:
+                    self._disableSignal(signal)
+            self._counter = (self._counter + 1)
+            if self._counter == 100:
+                self._counter = 0
+                self._enableAllSignals()
+            sleep(self._interval)
+
+    def _enableAllSignals(self):
+        print "Enabling all signals"
+
+    def _disableSignal(self, signal):
+        print "Signal " + signal + " disabled"
+
+    def setInterval(self, interval):
+        self._interval = interval;
+
+    def Add(self, name, percent, interval):
+        self.SetInterval(interval)
+        self._signals[name] = int(percent)
+
+    def Remove(self, name):
+        self._signals.pop(name, None)
+
+    def SetInterval(self, interval):
+        self._interval = interval
+
+    def SetPercent(self, name, percent):
+        self._signals[name] = percent
+
+    def Read(self, name):
+        return self.On if self._counter < self._signals[name] else self.Off
