@@ -123,6 +123,7 @@ class CHIP_PWM_Adapter(object):
         """Enable PWM output on specified pin.  Set to intiial percent duty cycle
         value (0.0 to 100.0) and frequency (in Hz).
         """
+        print "Starting CHIP PWM on pin " + str(pin)
         self._pwmEngine.Add(str(pin), dutycycle, (1/frequency_hz)/100);
         pass;
 
@@ -182,7 +183,6 @@ class PythonPwmEngine:
 
     def _ticktock(self):
         while True:
-            print self._counter
             for signal, percent in self._signals.iteritems():
                 if self._counter == percent:
                     self._disableSignal(signal)
@@ -193,10 +193,12 @@ class PythonPwmEngine:
             sleep(self._interval)
 
     def _enableAllSignals(self):
-        print "Enabling all signals"
+        #print "Enabling all signals"
+        pass
 
     def _disableSignal(self, signal):
-        print "Signal " + signal + " disabled"
+        #print "Signal " + signal + " disabled"
+        pass
 
     def setInterval(self, interval):
         self._interval = interval;
