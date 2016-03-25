@@ -465,7 +465,7 @@ class CHIPGPIOAdapter(BaseGPIO):
         if pin is not None:
             mode = self.modes[self.pins.index(self._pin_mapping[pin])]
             if mode == OUT:
-                self.output(self._pin_mapping[pin], 0)
+                self.output(pin, 0)
             cmd = "echo %d > /sys/class/gpio/unexport" % self._pin_mapping[pin]
             self.sp.call(cmd, shell=True)
             try:
