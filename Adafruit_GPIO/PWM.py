@@ -121,7 +121,9 @@ class CHIP_PWM_Adapter(object):
         """
         if dutycycle < 0.0 or dutycycle > 100.0:
             raise ValueError('Invalid duty cycle value, must be between 0.0 to 100.0 (inclusive).')
+        print "FREQ: " + str(frequency_hz)
         self.chipio_pwm.start(pin, dutycycle, frequency_hz)
+        print "CHIP_PWM_Adapter start end"
 
     def set_duty_cycle(self, pin, dutycycle):
         """Set percent duty cycle of PWM output on specified pin.  Duty cycle must
@@ -140,7 +142,7 @@ class CHIP_PWM_Adapter(object):
         self.chipio_pwm.stop(pin)
 
 
-def get_platform_pwm(**keywords):
+def get_platform_pwm(num_requested=1, **keywords):
     """Attempt to return a PWM instance for the platform which the code is being
     executed on.  Currently supports only the Raspberry Pi using the RPi.GPIO
     library and Beaglebone Black using the Adafruit_BBIO library.  Will throw an
@@ -156,7 +158,13 @@ def get_platform_pwm(**keywords):
         import Adafruit_BBIO.PWM
         return BBIO_PWM_Adapter(Adafruit_BBIO.PWM, **keywords)
     elif plat == Platform.CHIP:
-        import CHIP_IO.PWM
-        return CHIP_PWM_Adapter(CHIP_IO.PWM, **keywords)
+        if (num_requested == 1):
+            import CHIP_IO.PWM
+            return CHIP_PWM_Adapter(CHIP_IO.PWM, **keywords)
+        else:
+            print "Getting softpwm"
+            import CHIP_IO.SOFTPWM
+            print "Loaded softpwm"
+            return CHIP_PWM_Adapter(CHIP_IO.SOFTPWM, **keywords)
     elif plat == Platform.UNKNOWN:
         raise RuntimeError('Could not determine platform.')
