@@ -143,6 +143,27 @@ class CHIP_PWM_Adapter(object):
         """Stop PWM output on specified pin."""
         self.chipio_pwm.stop(pin)
 
+class DUMMY_PWM_Adapter(object):
+    """
+     Dummy PWM implementation for use on other hardware. The functions
+     don't do anything. Feel free to override them with debug statements.
+    """
+
+    def __init__(self):
+        pass;
+
+    def start(self, pin, dutycycle, frequency_hz=2000):
+        pass;
+
+    def set_duty_cycle(self, pin, dutycycle):
+        pass;
+
+    def set_frequency(self, pin, frequency_hz):
+        pass;
+
+    def stop(self, pin):
+        pass;
+
 
 def get_platform_pwm(**keywords):
     """Attempt to return a PWM instance for the platform which the code is being
@@ -170,4 +191,4 @@ def get_platform_pwm(**keywords):
         else:
             raise ValueError('For CHIP, you need to specify pwmtype in argument with value pwm or softpwm: get_platform_pwm(pwmtype="pwm") or get_platform_type(pwmtype="softpwm")')
     elif plat == Platform.UNKNOWN:
-        raise RuntimeError('Could not determine platform.')
+        return DUMMY_PWM_Adapter();

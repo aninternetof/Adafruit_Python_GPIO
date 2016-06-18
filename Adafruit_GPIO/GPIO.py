@@ -107,17 +107,17 @@ class BaseGPIO(object):
 
 
     def add_event_detect(self, pin, edge):
-        """Enable edge detection events for a particular GPIO channel.  Pin 
+        """Enable edge detection events for a particular GPIO channel.  Pin
         should be type IN.  Edge must be RISING, FALLING or BOTH.
         """
         raise NotImplementedError
-   
+
     def remove_event_detect(self, pin):
         """Remove edge detection for a particular GPIO channel.  Pin should be
         type IN.
         """
         raise NotImplementedError
-  
+
     def add_event_callback(self, pin, callback):
         """Add a callback for an event already defined using add_event_detect().
         Pin should be type IN.
@@ -125,19 +125,19 @@ class BaseGPIO(object):
         raise NotImplementedError
 
     def event_detected(self, pin):
-        """Returns True if an edge has occured on a given GPIO.  You need to 
-        enable edge detection using add_event_detect() first.   Pin should be 
+        """Returns True if an edge has occured on a given GPIO.  You need to
+        enable edge detection using add_event_detect() first.   Pin should be
         type IN.
         """
         raise NotImplementedError
 
     def wait_for_edge(self, pin, edge):
-        """Wait for an edge.   Pin should be type IN.  Edge must be RISING, 
+        """Wait for an edge.   Pin should be type IN.  Edge must be RISING,
         FALLING or BOTH."""
         raise NotImplementedError
 
     def cleanup(self, pin=None):
-        """Clean up GPIO event detection for specific pin, or all pins if none 
+        """Clean up GPIO event detection for specific pin, or all pins if none
         is specified.
         """
         raise NotImplementedError
@@ -207,7 +207,7 @@ class RPiGPIOAdapter(BaseGPIO):
         return [self.rpi_gpio.input(pin) for pin in pins]
 
     def add_event_detect(self, pin, edge, callback=None, bouncetime=-1):
-        """Enable edge detection events for a particular GPIO channel.  Pin 
+        """Enable edge detection events for a particular GPIO channel.  Pin
         should be type IN.  Edge must be RISING, FALLING or BOTH.  Callback is a
         function for the event.  Bouncetime is switch bounce timeout in ms for
         callback
@@ -232,7 +232,7 @@ class RPiGPIOAdapter(BaseGPIO):
         self.rpi_gpio.add_event_callback(pin, callback)
 
     def event_detected(self, pin):
-        """Returns True if an edge has occured on a given GPIO.  You need to 
+        """Returns True if an edge has occured on a given GPIO.  You need to
         enable edge detection using add_event_detect() first.   Pin should be
         type IN.
         """
@@ -245,7 +245,7 @@ class RPiGPIOAdapter(BaseGPIO):
         self.rpi_gpio.wait_for_edge(pin, self._edge_mapping[edge])
 
     def cleanup(self, pin=None):
-        """Clean up GPIO event detection for specific pin, or all pins if none 
+        """Clean up GPIO event detection for specific pin, or all pins if none
         is specified.
         """
         if pin is None:
@@ -297,9 +297,9 @@ class AdafruitBBIOAdapter(BaseGPIO):
         return [self.bbio_gpio.input(pin) for pin in pins]
 
     def add_event_detect(self, pin, edge, callback=None, bouncetime=-1):
-        """Enable edge detection events for a particular GPIO channel.  Pin 
+        """Enable edge detection events for a particular GPIO channel.  Pin
         should be type IN.  Edge must be RISING, FALLING or BOTH.  Callback is a
-        function for the event.  Bouncetime is switch bounce timeout in ms for 
+        function for the event.  Bouncetime is switch bounce timeout in ms for
         callback
         """
         kwargs = {}
@@ -317,7 +317,7 @@ class AdafruitBBIOAdapter(BaseGPIO):
 
     def add_event_callback(self, pin, callback, bouncetime=-1):
         """Add a callback for an event already defined using add_event_detect().
-        Pin should be type IN.  Bouncetime is switch bounce timeout in ms for 
+        Pin should be type IN.  Bouncetime is switch bounce timeout in ms for
         callback
         """
         kwargs = {}
@@ -326,20 +326,20 @@ class AdafruitBBIOAdapter(BaseGPIO):
         self.bbio_gpio.add_event_callback(pin, callback, **kwargs)
 
     def event_detected(self, pin):
-        """Returns True if an edge has occured on a given GPIO.  You need to 
-        enable edge detection using add_event_detect() first.   Pin should be 
+        """Returns True if an edge has occured on a given GPIO.  You need to
+        enable edge detection using add_event_detect() first.   Pin should be
         type IN.
         """
         return self.bbio_gpio.event_detected(pin)
 
     def wait_for_edge(self, pin, edge):
-        """Wait for an edge.   Pin should be type IN.  Edge must be RISING, 
+        """Wait for an edge.   Pin should be type IN.  Edge must be RISING,
         FALLING or BOTH.
         """
         self.bbio_gpio.wait_for_edge(pin, self._edge_mapping[edge])
 
     def cleanup(self, pin=None):
-        """Clean up GPIO event detection for specific pin, or all pins if none 
+        """Clean up GPIO event detection for specific pin, or all pins if none
         is specified.
         """
         if pin is None:
@@ -349,7 +349,7 @@ class AdafruitBBIOAdapter(BaseGPIO):
 
 class AdafruitMinnowAdapter(BaseGPIO):
     """GPIO implementation for the Minnowboard + MAX using the mraa library"""
-    
+
     def __init__(self,mraa_gpio):
         self.mraa_gpio = mraa_gpio
         # Define mapping of Adafruit GPIO library constants to mraa constants
@@ -366,24 +366,24 @@ class AdafruitMinnowAdapter(BaseGPIO):
         """Set the input or output mode for a specified pin.  Mode should be
         either DIR_IN or DIR_OUT.
         """
-        self.mraa_gpio.Gpio.dir(self.mraa_gpio.Gpio(pin),self._dir_mapping[mode])   
+        self.mraa_gpio.Gpio.dir(self.mraa_gpio.Gpio(pin),self._dir_mapping[mode])
 
     def output(self,pin,value):
         """Set the specified pin the provided high/low value.  Value should be
         either 1 (ON or HIGH), or 0 (OFF or LOW) or a boolean.
         """
         self.mraa_gpio.Gpio.write(self.mraa_gpio.Gpio(pin), value)
-    
+
     def input(self,pin):
         """Read the specified pin and return HIGH/true if the pin is pulled high,
         or LOW/false if pulled low.
         """
-        return self.mraa_gpio.Gpio.read(self.mraa_gpio.Gpio(pin))    
-    
+        return self.mraa_gpio.Gpio.read(self.mraa_gpio.Gpio(pin))
+
     def add_event_detect(self, pin, edge, callback=None, bouncetime=-1):
-        """Enable edge detection events for a particular GPIO channel.  Pin 
+        """Enable edge detection events for a particular GPIO channel.  Pin
         should be type IN.  Edge must be RISING, FALLING or BOTH.  Callback is a
-        function for the event.  Bouncetime is switch bounce timeout in ms for 
+        function for the event.  Bouncetime is switch bounce timeout in ms for
         callback
         """
         kwargs = {}
@@ -400,16 +400,16 @@ class AdafruitMinnowAdapter(BaseGPIO):
         self.mraa_gpio.Gpio.isrExit(self.mraa_gpio.Gpio(pin))
 
     def wait_for_edge(self, pin, edge):
-        """Wait for an edge.   Pin should be type IN.  Edge must be RISING, 
+        """Wait for an edge.   Pin should be type IN.  Edge must be RISING,
         FALLING or BOTH.
         """
         self.bbio_gpio.wait_for_edge(self.mraa_gpio.Gpio(pin), self._edge_mapping[edge])
 
 class CHIPGPIOAdapter(BaseGPIO):
-    """ GPIO implementation for the CHIP using brute force calls to deal with GPIO 
+    """ GPIO implementation for the CHIP using brute force calls to deal with GPIO
         Based on https://github.com/NextThingCo/ChippyRuxpin/blob/master/chippyRuxpin_gpio.py
     """
-    
+
     def __init__(self, chipio_gpio):
         self.chipio_gpio = chipio_gpio
         # Define mapping of Adafruit GPIO library constants to RPi.GPIO constants.
@@ -421,7 +421,7 @@ class CHIPGPIOAdapter(BaseGPIO):
         self._edge_mapping = { RISING:  chipio_gpio.RISING,
                                FALLING: chipio_gpio.FALLING,
                                BOTH:    chipio_gpio.BOTH }
-        
+
     def setup(self, pin, mode, pull_up_down=PUD_OFF):
         """ Setup the GPIO pin specified, will pull the GPIO number from the input string """
         self.chipio_gpio.setup(pin, self._dir_mapping[mode],
@@ -447,9 +447,9 @@ class CHIPGPIOAdapter(BaseGPIO):
         return [self.chipio_gpio.input(pin) for pin in pins]
 
     def add_event_detect(self, pin, edge, callback=None, bouncetime=-1):
-        """Enable edge detection events for a particular GPIO channel.  Pin 
+        """Enable edge detection events for a particular GPIO channel.  Pin
         should be type IN.  Edge must be RISING, FALLING or BOTH.  Callback is a
-        function for the event.  Bouncetime is switch bounce timeout in ms for 
+        function for the event.  Bouncetime is switch bounce timeout in ms for
         callback
         """
         kwargs = {}
@@ -467,7 +467,7 @@ class CHIPGPIOAdapter(BaseGPIO):
 
     def add_event_callback(self, pin, callback, bouncetime=-1):
         """Add a callback for an event already defined using add_event_detect().
-        Pin should be type IN.  Bouncetime is switch bounce timeout in ms for 
+        Pin should be type IN.  Bouncetime is switch bounce timeout in ms for
         callback
         """
         kwargs = {}
@@ -476,26 +476,65 @@ class CHIPGPIOAdapter(BaseGPIO):
         self.chipio_gpio.add_event_callback(pin, callback, **kwargs)
 
     def event_detected(self, pin):
-        """Returns True if an edge has occured on a given GPIO.  You need to 
-        enable edge detection using add_event_detect() first.   Pin should be 
+        """Returns True if an edge has occured on a given GPIO.  You need to
+        enable edge detection using add_event_detect() first.   Pin should be
         type IN.
         """
         return self.chipio_gpio.event_detected(pin)
 
     def wait_for_edge(self, pin, edge):
-        """Wait for an edge.   Pin should be type IN.  Edge must be RISING, 
+        """Wait for an edge.   Pin should be type IN.  Edge must be RISING,
         FALLING or BOTH.
         """
         self.chipio_gpio.wait_for_edge(pin, self._edge_mapping[edge])
 
     def cleanup(self, pin=None):
-        """Clean up GPIO event detection for specific pin, or all pins if none 
+        """Clean up GPIO event detection for specific pin, or all pins if none
         is specified.
         """
         if pin is None:
             self.chipio_gpio.cleanup()
         else:
             self.chipio_gpio.cleanup(pin)
+
+class CHIPGPIOAdapter(BaseGPIO):
+    """
+     Dummy GPIO implementation for use on other hardware. The functions
+     don't do anything. Feel free to override them with debug statements.
+    """
+
+    def __init__(self, chipio_gpio):
+        pass;
+
+    def setup(self, pin, mode, pull_up_down=PUD_OFF):
+        pass;
+
+    def output(self, pin, value):
+        pass;
+
+    def input(self, pin):
+        pass;
+
+    def input_pins(self, pins):
+        pass;
+
+    def add_event_detect(self, pin, edge, callback=None, bouncetime=-1):
+        pass;
+
+    def remove_event_detect(self, pin):
+        pass;
+
+    def add_event_callback(self, pin, callback, bouncetime=-1):
+        pass;
+
+    def event_detected(self, pin):
+        pass;
+
+    def wait_for_edge(self, pin, edge):
+        pass;
+
+    def cleanup(self, pin=None):
+        pass;
 
 def get_platform_gpio(**keywords):
     """Attempt to return a GPIO instance for the platform which the code is being
@@ -518,4 +557,4 @@ def get_platform_gpio(**keywords):
         import CHIP_IO.GPIO
         return CHIPGPIOAdapter(CHIP_IO.GPIO, **keywords)
     elif plat == Platform.UNKNOWN:
-        raise RuntimeError('Could not determine platform.')
+        return DUMMYCHIPAdapter();
