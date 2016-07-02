@@ -497,13 +497,13 @@ class CHIPGPIOAdapter(BaseGPIO):
         else:
             self.chipio_gpio.cleanup(pin)
 
-class CHIPGPIOAdapter(BaseGPIO):
+class DUMMYGPIOAdapter():
     """
      Dummy GPIO implementation for use on other hardware. The functions
      don't do anything. Feel free to override them with debug statements.
     """
 
-    def __init__(self, chipio_gpio):
+    def __init__(self):
         pass;
 
     def setup(self, pin, mode, pull_up_down=PUD_OFF):
@@ -557,4 +557,4 @@ def get_platform_gpio(**keywords):
         import CHIP_IO.GPIO
         return CHIPGPIOAdapter(CHIP_IO.GPIO, **keywords)
     elif plat == Platform.UNKNOWN:
-        return DUMMYCHIPAdapter();
+        return DUMMYGPIOAdapter();
