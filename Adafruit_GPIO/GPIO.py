@@ -497,7 +497,7 @@ class CHIPGPIOAdapter(BaseGPIO):
         else:
             self.chipio_gpio.cleanup(pin)
 
-class DUMMYGPIOAdapter():
+class DUMMYGPIOAdapter(BaseGPIO):
     """
      Dummy GPIO implementation for use on other hardware. The functions
      don't do anything. Feel free to override them with debug statements.
